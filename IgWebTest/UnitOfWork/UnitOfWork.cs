@@ -40,6 +40,7 @@ namespace IgWebTest.UnitOfWork
         private IIgniteUserLoginRepository _igniteUserLoginRepository;
         private IIgniteRoleRepository _igniteRoleRepository;
         private IIgniteUserRoleRepository _igniteUserRoleRepository;
+        private bool _disposed;
 
 
         public UnitOfWork(string connectionString)
@@ -202,8 +203,20 @@ namespace IgWebTest.UnitOfWork
 
         private void ResetRepositories()
         {
-            //_breedRepository = null;
-            //_catRepository = null;
+            _igniteUserRepository = null;
+            _igniteLocationRepository = null;
+            _igniteUserTypeRepository = null;
+            _igniteUserApplicationRepository = null;
+            _igniteApplicationStatusRepository = null;
+            _businessUnitRepository = null;
+            _departmentRepository = null;
+            _questionToAnswerRepository = null;
+            _titleRepository = null;
+            _igniteUserRoleClaimRepository = null;
+            _igniteUserClaimRepository = null;
+            _igniteUserLoginRepository = null;
+            _igniteRoleRepository = null;
+            _igniteUserRoleRepository = null;
         }
 
         public void RollBack()
@@ -212,7 +225,34 @@ namespace IgWebTest.UnitOfWork
         }
         public void Dispose()
         {
-            throw new NotImplementedException();
+            NewDispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public void NewDispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_transaction != null)
+                    {
+                        _transaction.Dispose();
+                        _transaction = null;
+                    }
+                    if (_connection != null)
+                    {
+                        _connection.Dispose();
+                        _connection = null;
+                    }
+                }
+                _disposed = true;
+            }
+        }
+
+        ~UnitOfWork()
+        {
+            NewDispose(false);
         }
     }
 }
