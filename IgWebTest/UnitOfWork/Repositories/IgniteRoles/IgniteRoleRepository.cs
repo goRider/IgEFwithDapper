@@ -79,5 +79,10 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteRoles
             return await Connection.QuerySingleOrDefaultAsync<IgniteRole>($@"SELECT * FROM [IgniteRole]
                 WHERE [Id] = @{nameof(roleId)}", new { roleId });
         }
+
+        public Task CreateRoleAsync(IgniteUser user, string password)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

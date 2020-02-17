@@ -12,13 +12,13 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.4" />
+    <PackageReference Include="Sendgrid" Version="9.12.6" />
     <PackageReference Include="Z.Dapper.Plus" Version="3.0.4" />
   </ItemGroup>
 
 
   <ItemGroup>
     <Folder Include="EFContext\" />
-    <Folder Include="Views\Account\" />
     <Folder Include="Views\Report\" />
   </ItemGroup>
 

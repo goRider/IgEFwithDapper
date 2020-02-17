@@ -18,5 +18,6 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteRoles
         void UpdateRole(IgniteRole entity);
         Task<IgniteRole> UpdateRoleAsync(int id);
         Task<IgniteRole> UpdateRoleAsync(IgniteRole entity);
+        Task CreateRoleAsync(IgniteUser user, string password);
     }
 }

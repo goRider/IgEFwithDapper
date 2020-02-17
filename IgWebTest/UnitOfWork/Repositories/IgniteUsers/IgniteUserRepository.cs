@@ -109,5 +109,13 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
         {
             throw new NotImplementedException();
         }
+
+        public async Task CreateUserAsync(IgniteUser entity, string password)
+        {
+            await Connection.QueryAsync<int>($@"insert into ign.IgniteUser(UserName, NormalizedUserName, IgniteEmail, NormalizedIgniteEmail, " +
+                                             $@"IgniteEmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled)  values ({nameof(entity.UserName)}, @{nameof(entity.NormalizedUserName)}), " +
+                                             $@"{nameof(entity.IgniteEmail)}, @{nameof(entity.NormalizedIgniteEmail)}, @{nameof(entity.IgniteEmailConfirmed)}" +
+                                             $@"{nameof(entity.PasswordHash)}, @{nameof(entity.PhoneNumber)}, @{nameof(entity.PhoneNumberConfirmed)}, @{nameof(entity.TwoFactorEnabled)}", entity);
+        }
     }
 }

@@ -18,5 +18,6 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
         void UpdateUserGeneralInfo(IgniteUser entity);
         void UpdateUserPassword(IgniteUser entity);
         Task<int> UpdateUserInfoAsync(IgniteUser entity);
+        Task CreateUserAsync(IgniteUser entity, string password);
     }
 }

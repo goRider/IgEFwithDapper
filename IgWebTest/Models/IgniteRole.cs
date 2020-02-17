@@ -7,6 +7,10 @@ namespace IgWebTest.Models
     {
         public IgniteRole()
         {
+        }
+
+        public IgniteRole(string adminUser)
+        {
             IgniteRoleClaim = new HashSet<IgniteRoleClaim>();
             IgniteUserRole = new HashSet<IgniteUserRole>();
         }
