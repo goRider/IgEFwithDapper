@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using IgWebTest.DAL;
 using IgWebTest.EFContext;
 using IgWebTest.Models;
+using IgWebTest.Utility.PasswordHashers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +46,12 @@ namespace IgWebTest
             services.AddTransient<IUserStore<IgniteUser>, DataStores.UserStore>();
             services.AddTransient<IRoleStore<IgniteRole>, DataStores.RoleStore>();
 
-            //services.Configure<ConnectionOptions>(Configuration);
+            services.Configure<PasswordHasherOptions>(options =>
+                {
+                    options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2;
+                });
+            services.AddScoped<IPasswordHasher<IgniteUser>, MyPasswordHasher<IgniteUser>>();
+
             services.AddDataProtection();
 
             services.Configure<IgWebTest.DAL.ConnectionOptions.ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));

@@ -1,0 +1,459 @@
+﻿USE IgniteTestDatabase
+
+GO
+IF NOT EXISTS ( SELECT  * FROM sys.schemas WHERE name = N'ign')
+  EXEC('create schema [ign]')
+
+GO
+  -- Remove Foreign Key
+while(exists(select 1 from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_TYPE='FOREIGN KEY'))
+begin
+
+	declare @sql nvarchar(2000)
+
+	SELECT TOP 1 @sql=('ALTER TABLE ' + TABLE_SCHEMA + '.[' + TABLE_NAME
+
+
+	+ '] DROP CONSTRAINT [' + CONSTRAINT_NAME + ']')
+
+
+	FROM information_schema.table_constraints
+
+
+	WHERE CONSTRAINT_TYPE = 'FOREIGN KEY'
+
+	exec (@sql)
+end
+
+-- DROP TABLES THAT EXIST
+
+IF OBJECT_ID ('ign.IgniteUser', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUser
+GO
+
+--SELECT * FROM ign.IgniteUserTitle
+--  GO
+
+IF OBJECT_ID ('ign.Department', 'U') IS NOT NULL
+  DROP TABLE ign.Department
+GO
+
+  IF OBJECT_ID ('ign.IgniteUserTitle', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserTitle
+GO
+
+  IF OBJECT_ID ('dbo.IgniteUserTitle', 'U') IS NOT NULL
+  DROP TABLE dbo.IgniteUserTitle
+GO
+
+  IF OBJECT_ID ('ign.IgniteUserLocation', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserLocation
+GO
+
+IF OBJECT_ID ('ign.IgniteBusinessUnit', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteBusinessUnit
+GO
+
+IF OBJECT_ID ('ign.IgniteUserType', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserType
+GO
+
+IF OBJECT_ID ('ign.IgniteUserApplication', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserApplication;
+
+IF OBJECT_ID('ign.IgniteApplicationStatus', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteApplicationStatus;
+
+IF OBJECT_ID('ign.QuestionsToAnswer', 'U') IS NOT NULL
+  DROP TABLE ign.QuestionsToAnswer;
+
+IF OBJECT_ID('ign.IgniteRole', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteRole;
+
+IF OBJECT_ID('ign.IgniteUserRole', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserRole;
+
+IF OBJECT_ID('ign.IgniteUserClaim', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserClaim;
+
+IF OBJECT_ID('ign.IgniteRoleClaim', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteRoleClaim;
+
+IF OBJECT_ID('ign.IgniteUserRoleClaim', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserRoleClaim;
+
+IF OBJECT_ID('ign.IgniteUserToken', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserToken;
+
+IF OBJECT_ID('ign.IgniteUserLogin', 'U') IS NOT NULL
+  DROP TABLE ign.IgniteUserLogin;
+
+CREATE TABLE ign.IgniteUserLogin (
+  LoginProvider NVARCHAR(128) NOT NULL
+ ,ProviderKey NVARCHAR(128) NOT NULL
+ ,ProviderDisplayName NVARCHAR(128) NULL
+ ,UserId INT NOT NULL
+ ,CONSTRAINT PK_IgniteUserLogin PRIMARY KEY CLUSTERED (LoginProvider, ProviderKey)
+);
+GO
+
+CREATE TABLE ign.IgniteUserToken(
+  UserId INT NOT NULL
+ ,LoginProvider NVARCHAR(128) NOT NULL
+ ,Name NVARCHAR(128) NOT NULL
+ ,Value NVARCHAR(128) NULL
+ ,CONSTRAINT PK_IgniteUserToken PRIMARY KEY CLUSTERED (UserId, LoginProvider, Name)
+);
+
+CREATE TABLE ign.IgniteUserClaim(
+  Id INT IDENTITY,
+  UserId INT NOT NULL,
+  ClaimType NVARCHAR(128),
+  ClaimValue NVARCHAR(128),
+  CONSTRAINT FK_IgniteUserClaim PRIMARY KEY CLUSTERED (Id)
+);
+
+CREATE TABLE ign.IgniteRoleClaim(
+  Id INT IDENTITY
+ ,RoleId INT NOT NULL
+ ,ClaimType NVARCHAR(128) NULL
+ ,ClaimValue NVARCHAR(128) NULL
+ ,CONSTRAINT PK_IgniteRoleClaim PRIMARY KEY CLUSTERED (Id)
+);
+
+CREATE TABLE ign.IgniteRole (
+  Id INT NOT NULL IDENTITY,
+  Name NVARCHAR(128) NULL,
+  NormalizedName NVARCHAR(128) NULL,
+  ConcurrencyStamp NVARCHAR(128) NULL,
+  CONSTRAINT PK_IgniteRole PRIMARY KEY CLUSTERED(Id)
+) ;
+
+CREATE TABLE ign.IgniteUserRole (
+  IgniteUserRoleId INT NOT NULL,
+  RoleId INT NOT NULL,
+  CONSTRAINT PK_IgniteUserRole PRIMARY KEY CLUSTERED(IgniteUserRoleId, RoleId)
+);
+
+
+
+CREATE TABLE ign.IgniteUser(
+  IgniteId INT NOT NULL IDENTITY,
+  UserName NVARCHAR(80) null,
+  NormalizedUserName NVARCHAR(80) null,
+  PasswordHash NVARCHAR(100) NULL,
+  SecurityStamp NVARCHAR(200) NULL,
+  ConcurrencyStamp NVARCHAR(200) NULL,
+  PhoneNumber NVARCHAR(21),
+  PhoneNumberConfirmed BIT NOT NULL,
+  TwoFactorEnabled BIT NOT null,
+  LockoutEnd DATETIME2(7) null,
+  AccessFailedCount INT NOT NULL,
+  IgniteUserCreatedDate DATETIME2 NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FirstName NVARCHAR(70) null,
+  MiddleName NVARCHAR(70) null,
+  LastName NVARCHAR(70) NULL,
+  FirstNameLastName NVARCHAR(210) null,
+  IgniteEmail NVARCHAR(110) null, -- Make this field unique with index
+  IgniteEmailConfirmed BIT NOT NULL DEFAULT 0,
+  NormalizedIgniteEmail NVARCHAR(110) null,
+  IsInternalUser BIT NOT NULL DEFAULT 0,
+  WorkedOverOneYear BIT NOT NULL DEFAULT 0,
+  IsQualifiedForLongTermEmp BIT NOT NULL DEFAULT 0,
+  CompletedUndergraduate BIT NOT NULL DEFAULT 0,
+  PreQualificationAccepted BIT NOT NULL DEFAULT 0,
+  HiredDate DATE NOT NULL,
+  TermDate DATE NULL,
+  ApplicationApprovalDate DATETIME2(3) NULL,
+  EligibleForQualification BIT NOT NULL DEFAULT 0,
+  LinkClicked BIT NOT NULL DEFAULT 0,
+  -- create Fkeys
+  FkDepartmentId INT NOT NULL DEFAULT 0, --- Create Dept Table
+  FkTitleId INT NOT NULL DEFAULT 0,
+  FkLocationId INT NOT NULL DEFAULT 0,
+  FkBuid INT NOT NULL DEFAULT 0,
+  FkIgniteUserTypeId INT NOT NULL DEFAULT 1,
+  CONSTRAINT PK_IgniteUser PRIMARY KEY CLUSTERED (IgniteId)
+  )
+
+    GO
+
+
+
+CREATE TABLE ign.Department(
+  DepartmentId INT NOT NULL
+  ,DepartmentName NVARCHAR(40) NULL
+  ,CONSTRAINT PK_Department PRIMARY KEY CLUSTERED (DepartmentId)
+  )
+  GO
+
+
+-- SELECT * FROM ign.Department -- Successful select
+
+  GO
+
+CREATE TABLE ign.IgniteUserTitle
+  (
+  TitleId INT NOT NULL,
+  TitleName NVARCHAR(80) NULL,
+  CONSTRAINT PK_IgniteUserTitle PRIMARY KEY CLUSTERED (TitleId)
+  )
+  GO
+
+--INSERT INTO ign.IgniteUserTitle (TitleId, TitleName) 
+--  VALUES (0, 'N/A'),(1, 'IT Developer Analyst I'),(2, 'IT Developer Analyst II'),(3, 'Lead Developer'),(4, 'Spec Developer'),(5, 'Spec Developer'),(6, 'Director'),(7, 'Frontend Developer'),(8, 'Business Analyst II'),(9, 'Database Admin II'),(10, 'Graphics Designer'),(11, 'Network Engineer (Sr)'),(12, 'Director'),(13, 'Vice President'),(14, 'Owner')
+--  GO
+
+
+CREATE TABLE ign.IgniteUserLocation
+  (
+  LocationId INT NOT NULL,
+  CityLocationName NVARCHAR(80) NULL,
+  StateLocationName NVARCHAR(80) NULL,
+  CountryLocationName NVARCHAR(80) NULL,
+  CONSTRAINT PK_IgniteUserLocation PRIMARY KEY CLUSTERED (LocationId)
+  )
+  GO
+
+CREATE TABLE ign.IgniteBusinessUnit
+  (
+  BUID INT NOT NULL,
+  BusinessUnitName NVARCHAR(50) NULL,
+  CONSTRAINT PK_IgniteBusinessUnit PRIMARY KEY CLUSTERED (BUID)
+  );
+
+CREATE TABLE ign.IgniteUserType
+  (
+  IgniteUserTypeId INT NOT NULL,
+  IgniteUserTypeName NVARCHAR(40) NULL,
+  CONSTRAINT PK_IgniteUserType PRIMARY KEY CLUSTERED (IgniteUserTypeId)
+);
+
+CREATE TABLE ign.IgniteApplicationStatus
+  (
+  StatusId INT NOT NULL,
+  StatusName NVARCHAR(50) NULL,
+  CONSTRAINT PK_ApplicationStatus PRIMARY KEY CLUSTERED (StatusId)
+);
+
+CREATE TABLE ign.IgniteUserApplication
+  (
+  ApplicationId INT NOT NULL IDENTITY,
+  ApplicationCreationDate DATETIME2(7) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ManagerName NVARCHAR(130) NULL,
+  BuName NVARCHAR(100) NULL,
+  LocationName NVARCHAR(240) NULL,
+  EmployementOverOneYear BIT NOT NULL DEFAULT 0,
+  BachelorDegreeQualifier BIT NOT NULL DEFAULT 0,
+  BachelorDegreePursuing BIT NOT NULL DEFAULT 0,
+  PreQualificationQuestionsCompletionDate DATETIME2(3),
+  ArePrequalificationQuestionComplete BIT NOT NULL DEFAULT 0,
+  ManagerStatusChangeDate DATETIME2(3) NULL,
+  AreQualificationQuestionsComplete BIT NOT NULL DEFAULT 0,
+  FkApplicationStatusId INT NOT NULL DEFAULT 0, -- Fk Key To Application Status
+  FkIgniteUserId INT NOT NULL, -- Fk to Ignite User
+  CONSTRAINT PK_IgniteUserApplication PRIMARY KEY CLUSTERED (ApplicationId)
+);
+
+--String_ES
+-- Next start for questionanswers
+
+
+
+
+
+
+CREATE TABLE ign.QuestionsToAnswer
+  (
+  QuestionAnswerId INT NOT NULL IDENTITY,
+  FirstPreQualQuestion NVARCHAR(40) NULL DEFAULT 'Employee Title',
+  FirstPreQualAnswer NVARCHAR(40) NULL DEFAULT '',
+  SecondPreQualQuestion NVARCHAR(40) NULL DEFAULT 'Department',
+  SecondPreQualAnswer NVARCHAR(40) NULL DEFAULT '',
+  ThirdPreQualQuestion NVARCHAR(40) NULL DEFAULT 'BusinessUnit',
+  ThirdPreQualAnswer NVARCHAR(40) NULL DEFAULT '',
+  FourthPreQualQuestion NVARCHAR(40) NULL DEFAULT 'Manager Name',
+  FourthPreQualAnswer NVARCHAR(40) NULL DEFAULT '',
+  FifthPreQualQuestion NVARCHAR(40) NULL DEFAULT '',
+  FifthPreQualAnswer BIT NOT NULL DEFAULT 0,
+  SixthPreQualQuestion TEXT NULL DEFAULT '',
+  SixthPreQualAnswer BIT NOT NULL DEFAULT 0,
+  FirstQualQuestion TEXT NULL DEFAULT '',
+  FirstQualAnswer TEXT NULL DEFAULT '',
+  SecondQualQuestion TEXT NULL DEFAULT '',
+  SecondQualAnswer TEXT NULL DEFAULT '',
+  ThirdQualQuestion TEXT NULL DEFAULT '',
+  ThirdQualAnswer TEXT NULL DEFAULT '',
+  FourthQualQuestion TEXT NULL DEFAULT '',
+  FourthQualAnswer TEXT NULL DEFAULT '',
+  CompletePreQualificationQuestionsDate DATETIME2(3) NULL,
+  CompleteQualificationQuestionsDate DATETIME2(3) NULL,
+  FkIgniteApplicationId INT NOT NULL
+  CONSTRAINT PK_QuestionToAnswers PRIMARY KEY CLUSTERED (QuestionAnswerId)
+);
+
+GO
+-- Next Line Add Foreign Keys
+  --CLEAR FKRelationships
+while(exists(select 1 from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_TYPE='FOREIGN KEY'))
+begin
+
+	declare @sql nvarchar(2000)
+
+	SELECT TOP 1 @sql=('ALTER TABLE ' + TABLE_SCHEMA + '.[' + TABLE_NAME
+
+
+	+ '] DROP CONSTRAINT [' + CONSTRAINT_NAME + ']')
+
+
+	FROM information_schema.table_constraints
+
+
+	WHERE CONSTRAINT_TYPE = 'FOREIGN KEY'
+
+	exec (@sql)
+end
+
+  -- Ignite User Token to Ignite User
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserToken
+  ADD CONSTRAINT FK_IgniteUserToken_IgniteUser FOREIGN KEY (UserId) REFERENCES ign.IgniteUser (IgniteId);
+
+
+  -- Ignite user to ignite roles via IgniteUserRole
+CREATE INDEX IX_IgniteUserRole_RoleId
+ON IgniteTestDatabase.ign.IgniteUserRole (RoleId)
+ON [PRIMARY]
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserRole
+ADD CONSTRAINT FK_IgniteUserRole_IgniteRole_RoleId FOREIGN KEY (RoleId) REFERENCES ign.IgniteRole (Id) ON DELETE CASCADE
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserRole
+ADD CONSTRAINT FK_IgniteUserRole_IgniteUser_IgniteId FOREIGN KEY (IgniteUserRoleId) REFERENCES ign.IgniteUser (IgniteId) ON DELETE CASCADE
+GO
+-- Ignite Role Index
+
+  CREATE UNIQUE INDEX RoleNameIndex
+ON IgniteTestDatabase.ign.IgniteRole (NormalizedName)
+WHERE ([NormalizedName] IS NOT NULL)
+ON [PRIMARY]
+GO
+-- Ignite Role Claims to ignite roles 
+CREATE INDEX IX_IgniteRoleClaim_RoleId
+ON IgniteTestDatabase.ign.IgniteRoleClaim (RoleId)
+ON [PRIMARY]
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteRoleClaim
+ADD CONSTRAINT FK_IgniteRoleClaim_IgniteRole_RoleId FOREIGN KEY (RoleId) REFERENCES ign.IgniteRole (Id) ON DELETE CASCADE
+GO
+-- Ignite User Claims to Ignite Users
+
+  CREATE INDEX IX_IgniteUserClaim_UserId
+ON IgniteTestDatabase.ign.IgniteUserClaim (UserId)
+ON [PRIMARY]
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserClaim
+ADD CONSTRAINT FK_IgniteUserClaim_IgniteUser_IgniteId FOREIGN KEY (UserId) REFERENCES ign.IgniteUser (IgniteId) ON DELETE CASCADE;
+GO
+
+
+-- Ignite User Logins
+
+  CREATE INDEX IX_IgniteUserLogin_UserId
+ON IgniteTestDatabase.ign.IgniteUserLogin (UserId)
+ON [PRIMARY]
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserLogin
+ADD CONSTRAINT FK_IgniteUserLogin_IgniteUser_UserId FOREIGN KEY (UserId) REFERENCES ign.IgniteUser (IgniteId) ON DELETE CASCADE
+GO
+  -- Ignite Users
+CREATE INDEX IgniteEmailIndex
+ON IgniteTestDatabase.ign.IgniteUser (NormalizedIgniteEmail)
+ON [PRIMARY];
+GO
+
+CREATE UNIQUE INDEX UserNameIndex
+ON IgniteTestDatabase.ign.IgniteUser (NormalizedUserName)
+WHERE ([NormalizedUserName] IS NOT NULL)
+ON [PRIMARY];
+GO
+
+CREATE UNIQUE INDEX IX_IgniteUser_IgniteEmail
+ON IgniteTestDatabase.ign.IgniteUser (IgniteEmail)
+  WHERE ([IgniteEmail] IS NOT NULL)
+ON [PRIMARY];
+GO
+
+  CREATE UNIQUE INDEX IX_IgniteUser_FkBuid
+ON IgniteTestDatabase.ign.IgniteUser (FkBuid)
+ON [PRIMARY];
+GO
+
+    CREATE UNIQUE INDEX IX_IgniteUser_FkDepartmentId
+ON IgniteTestDatabase.ign.IgniteUser (FkDepartmentId)
+ON [PRIMARY];
+GO
+  
+    CREATE UNIQUE INDEX IX_IgniteUser_FkTitleId
+ON IgniteTestDatabase.ign.IgniteUser (FkTitleId)
+ON [PRIMARY];
+GO
+
+    CREATE UNIQUE INDEX IX_IgniteUser_FkIgniteUserTypeId
+ON IgniteTestDatabase.ign.IgniteUser (FkIgniteUserTypeId)
+ON [PRIMARY];
+GO
+  
+    CREATE UNIQUE INDEX IX_IgniteUser_FkLocationId
+ON IgniteTestDatabase.ign.IgniteUser (FkLocationId)
+ON [PRIMARY];
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUser
+ADD CONSTRAINT FK_IgniteUser_IgniteBusinessUnit_FkBuid FOREIGN KEY (FkBuid) REFERENCES ign.IgniteBusinessUnit (BUID) ON DELETE CASCADE;
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUser
+ADD CONSTRAINT FK_IgniteUser_Department_FkDepartmentId FOREIGN KEY (FkDepartmentId) REFERENCES ign.Department (DepartmentId) ON DELETE CASCADE;
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUser
+ADD CONSTRAINT FK_IgniteUser_IgniteUserType_FkIgniteUserTypeId FOREIGN KEY (FkIgniteUserTypeId) REFERENCES ign.IgniteUserType (IgniteUserTypeId) ON DELETE CASCADE;
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUser
+ADD CONSTRAINT FK_IgniteUser_IgniteUserLocation_FkLocationId FOREIGN KEY (FkLocationId) REFERENCES ign.IgniteUserLocation (LocationId) ON DELETE CASCADE;
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUser
+ADD CONSTRAINT FK_IgniteUser_IgniteUserTitle_FkTitleId FOREIGN KEY (FkTitleId) REFERENCES ign.IgniteUserTitle (TitleId) ON DELETE CASCADE;
+GO
+  -- Ignite User Applications
+
+CREATE INDEX IX_IgniteUserApplication_FkApplicationStatusStatusId
+  ON IgniteTestDatabase.ign.IgniteUserApplication (FkApplicationStatusId)
+  ON [PRIMARY];
+
+  GO 
+
+  CREATE INDEX IX_IgniteUserApplication_FkIgniteUserId
+  ON IgniteTestDatabase.ign.IgniteUserApplication (FkIgniteUserId)
+  ON [PRIMARY];
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.IgniteUserApplication
+  ADD CONSTRAINT FK_IgniteUserApplication_FkApplicationStatusId FOREIGN KEY (FkApplicationStatusId) REFERENCES ign.IgniteApplicationStatus (StatusId);
+
+  ALTER TABLE IgniteTestDatabase.ign.IgniteUserApplication
+  ADD CONSTRAINT FK_IgniteUserApplication_FkIgniteUserId FOREIGN KEY (FkIgniteUserId) REFERENCES ign.IgniteUser (IgniteId);
+
+  -- QuestionToAnswer
+CREATE UNIQUE INDEX IX_QuestionsToAnswer_FkIgniteApplicationId
+ON IgniteTestDatabase.ign.QuestionsToAnswer (FkIgniteApplicationId)
+ON [PRIMARY];
+GO
+
+ALTER TABLE IgniteTestDatabase.ign.QuestionsToAnswer
+ADD CONSTRAINT FK_QuestionsToAnswer_IgniteUserApplication_FkIgniteApplicationId FOREIGN KEY (FkIgniteApplicationId) REFERENCES ign.IgniteUserApplication (ApplicationId) ON DELETE CASCADE;
+GO

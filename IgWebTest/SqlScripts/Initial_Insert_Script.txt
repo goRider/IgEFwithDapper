@@ -1,0 +1,23 @@
+﻿INSERT INTO ign.IgniteUserTitle (TitleId, TitleName)
+  VALUES (0, 'N/A'),(1, 'IT Developer Analyst I'),(2, 'IT Developer Analyst II'),(3, 'Lead Developer'),(4, 'Spec Developer'),(5, 'Spec Developer'),(6, 'Director'),(7, 'Frontend Developer'),(8, 'Business Analyst II'),(9, 'Database Admin II'),(10, 'Graphics Designer'),(11, 'Network Engineer (Sr)'),(12, 'Director'),(13, 'Vice President'),(14, 'Owner')
+
+
+INSERT INTO ign.Department (DepartmentId, DepartmentName)
+  VALUES (0, 'N/A'), (1, 'App Dev'), (2, 'Behavioral Science and Innovation'), (3, 'Creative Services'), (4, 'Creative QA'), (5, 'Finance Systems'), (6, 'Ford'),(7, 'Insurance and Card'),(8, 'Insurance');
+
+
+
+INSERT INTO ign.IgniteUserLocation (LocationId, CityLocationName, StateLocationName, CountryLocationName)
+  VALUES (0, N'N/A', N'N/A', N'N/A'),(1, N'Fenton', N'MO', N'United States'),(2, N'Maumee', N'OH', N'United States'),(3, N'Twinsburg', N'MO', N'United States'),(4, N'Lehi', N'UT', N'United States'),(5, N'Irvine', N'CA', N'United States')
+,(6, N'Franklin', N'TN', N'United States');
+
+
+INSERT INTO ign.IgniteUserType (IgniteUserTypeId, IgniteUserTypeName)
+  VALUES (1, 'Admin'), (2, 'HR Lead'), (3, 'Manager'), (4, 'Regular Employee')
+
+
+INSERT INTO ign.IgniteBusinessUnit (BUID, BusinessUnitName)
+  VALUES (0, 'N/A'), (1, 'Corporate'), (2, 'MGE'), (3, 'MM/Auto'), (4, 'CX');
+
+INSERT INTO ign.IgniteApplicationStatus (StatusId, StatusName)
+  VALUES (0, 'No App'), (1, 'Not Started'), (2, 'Incomplete Prequalification'), (3, 'Complete Prequalification'), (4, 'Approved For Qualification'), (5, 'Incomplete Qualification'), (6, 'Complete Qualification'),(7, 'Endorsed'),(8, 'Hold'),(9, 'Selected');

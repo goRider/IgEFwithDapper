@@ -19,6 +19,7 @@
   <ItemGroup>
     <Folder Include="EFContext\" />
     <Folder Include="Views\Account\" />
+    <Folder Include="Views\Report\" />
   </ItemGroup>
 
 </Project>
