@@ -3,7 +3,7 @@ using IgWebTest.Models;
 
 namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
 {
-    internal interface IIgniteUserRepository
+    public interface IIgniteUserRepository
     {
         void CreateUser(IgniteUser entity);
         IEnumerable<IgniteUser> GetUserList();

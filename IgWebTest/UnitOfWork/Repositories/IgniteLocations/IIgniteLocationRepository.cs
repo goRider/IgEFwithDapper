@@ -1,6 +1,6 @@
 ﻿namespace IgWebTest.UnitOfWork.Repositories.IgniteLocations
 {
-    internal interface IIgniteLocationRepository
+    public interface IIgniteLocationRepository
     {
     }
 }

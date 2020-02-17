@@ -19,7 +19,6 @@
   <ItemGroup>
     <Folder Include="DataStores\" />
     <Folder Include="EFContext\" />
-    <Folder Include="UnitOfWork\Repositories\IgniteUserClaims\" />
     <Folder Include="Views\Account\" />
   </ItemGroup>
 
