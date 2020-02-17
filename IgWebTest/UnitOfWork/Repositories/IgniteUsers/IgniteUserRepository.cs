@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Dapper;
 using IgWebTest.Models;
 
 namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
@@ -18,6 +20,19 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
         public void CreateUser(IgniteUser entity)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task CreateUserAsync(IgniteUser entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("No Entity");
+            }
+
+            await Connection.QueryAsync<int>($@"insert into ign.IgniteUser(UserName, NormalizedUserName, IgniteEmail, NormalizedIgniteEmail, " +
+                                        $@"IgniteEmailConfirmed, PasswordHash, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled)  values ({nameof(entity.UserName)}, @{nameof(entity.NormalizedUserName)}), " + 
+                                        $@"{nameof(entity.IgniteEmail)}, @{nameof(entity.NormalizedIgniteEmail)}, @{nameof(entity.IgniteEmailConfirmed)}" +
+                                        $@"{nameof(entity.PasswordHash)}, @{nameof(entity.PhoneNumber)}, @{nameof(entity.PhoneNumberConfirmed)}, @{nameof(entity.TwoFactorEnabled)}", entity);
         }
 
         public IEnumerable<IgniteUser> GetUserList()
@@ -55,6 +70,12 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
             throw new NotImplementedException();
         }
 
+        public async Task<IgniteUser> FindUserByEmailAsync(string normalizedEmail)
+        {
+            return await Connection.QuerySingleOrDefaultAsync<IgniteUser>($@"select * from ign.IgniteUser where NormalizedIgniteEmail " +
+                                                                   $@"= @{nameof(normalizedEmail)}", new { normalizedEmail });
+        }
+
         /// <summary>
         /// This update is available for all user information excluding passwords
         /// </summary>
@@ -65,6 +86,26 @@ namespace IgWebTest.UnitOfWork.Repositories.IgniteUsers
         }
 
         public void UpdateUserPassword(IgniteUser entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<int> UpdateUserInfoAsync(IgniteUser entity)
+        {
+            return await Connection.ExecuteAsync($@"UPDATE [IgniteUser] SET
+                [UserName] = @{nameof(IgniteUser.UserName)},
+                [NormalizedUserName] = @{nameof(IgniteUser.NormalizedUserName)},
+                [IgniteEmail] = @{nameof(IgniteUser.IgniteEmail)},
+                [NormalizedIgniteEmail] = @{nameof(IgniteUser.NormalizedIgniteEmail)},
+                [IgniteEmailConfirmed] = @{nameof(IgniteUser.IgniteEmailConfirmed)},
+                [PasswordHash] = @{nameof(IgniteUser.PasswordHash)},
+                [PhoneNumber] = @{nameof(IgniteUser.PhoneNumber)},
+                [PhoneNumberConfirmed] = @{nameof(IgniteUser.PhoneNumberConfirmed)},
+                [TwoFactorEnabled] = @{nameof(IgniteUser.TwoFactorEnabled)}
+                WHERE [Id] = @{nameof(IgniteUser.IgniteId)}", entity);
+        }
+
+        Task<int> IIgniteUserRepository.UpdateUserInfoAsync(IgniteUser entity)
         {
             throw new NotImplementedException();
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace IgWebTest.UnitOfWork.Repositories
         {
             get { return Transaction.Connection; }
         }
-
+        
         public BaseRepository(IDbTransaction transaction)
         {
             Transaction = transaction;

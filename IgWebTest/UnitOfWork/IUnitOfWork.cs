@@ -39,8 +39,7 @@ namespace IgWebTest.UnitOfWork
 
         //IIgniteUser
         #endregion
-        void BeginTransaction();
+        //void BeginTransaction();
         void Commit();
-        void RollBack();
     }
 }

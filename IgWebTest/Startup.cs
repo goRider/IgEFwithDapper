@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IgWebTest.DAL;
-using IgWebTest.EFCore;
+using IgWebTest.EFContext;
+using IgWebTest.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -34,8 +36,14 @@ namespace IgWebTest
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            services.AddIdentity<IgniteUser, IgniteRole>()
+                .AddDefaultTokenProviders();
+
             //Configuration.GetSection()
             services.AddDbContext<IgniteTestDatabaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("IgniteTestDatabase")));
+
+            services.AddTransient<IUserStore<IgniteUser>, DataStores.UserStore>();
+            services.AddTransient<IRoleStore<IgniteRole>, DataStores.RoleStore>();
 
             //services.Configure<ConnectionOptions>(Configuration);
             services.AddDataProtection();
@@ -58,6 +66,8 @@ namespace IgWebTest
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseAuthentication();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

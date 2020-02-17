@@ -3,7 +3,7 @@ using IgWebTest.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace IgWebTest.EFCore
+namespace IgWebTest.EFContext
 {
     public partial class IgniteTestDatabaseContext : DbContext
     {
@@ -34,9 +34,6 @@ namespace IgWebTest.EFCore
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

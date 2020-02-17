@@ -31,6 +31,7 @@ namespace IgWebTest.Models
         public string LastName { get; set; }
         public string FirstNameLastName { get; set; }
         public string IgniteEmail { get; set; }
+        public bool IgniteEmailConfirmed { get; set; }
         public string NormalizedIgniteEmail { get; set; }
         public bool IsInternalUser { get; set; }
         public bool WorkedOverOneYear { get; set; }

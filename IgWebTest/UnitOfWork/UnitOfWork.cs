@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using IgWebTest.UnitOfWork.Repositories.BusinessUnits;
 using IgWebTest.UnitOfWork.Repositories.Departments;
@@ -42,14 +43,18 @@ namespace IgWebTest.UnitOfWork
         private IIgniteUserRoleRepository _igniteUserRoleRepository;
         private bool _disposed;
 
-
+        /// <summary>
+        /// This constructor accepts a connection string and opens a connection. After the end of the lifecycle of this constructor the connection will be closed and be disposed
+        /// </summary>
+        /// <param name="connectionString"></param>
         public UnitOfWork(string connectionString)
         {
-            _connection = new SqlConnection();
+            _connection = new SqlConnection(connectionString);
             _connection.Open();
             _transaction = _connection.BeginTransaction();
         }
 
+        
         #region Repository Getters
         public IIgniteUserRepository IgniteUserRepository
         {
@@ -176,12 +181,7 @@ namespace IgWebTest.UnitOfWork
             }
         }
         #endregion
-
-        public void BeginTransaction()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public void Commit()
         {
             try

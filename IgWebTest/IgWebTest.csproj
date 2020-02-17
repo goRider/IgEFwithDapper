@@ -17,7 +17,6 @@
 
 
   <ItemGroup>
-    <Folder Include="DataStores\" />
     <Folder Include="EFContext\" />
     <Folder Include="Views\Account\" />
   </ItemGroup>
